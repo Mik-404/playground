@@ -17,6 +17,29 @@ For usage information, run the program with the `-h` flag.
 - `.` конкатенация, но её можно пропускать
 - `ϵ` эпсилон
 
+Для представления автоматов используется следующий подход:
+```
+    {
+        "S" : [
+            "s0",
+            "s1",
+            "s2"
+        ],
+        "start" : "s0",
+        "F" : [
+            "s1",
+            "s2"
+        ],
+        "delta" : [
+            {
+                "from" : "s0",
+                "to" : "s1",
+                "sym": "a"
+            }
+        ]
+    }
+```
+
 # To build and run:
 `cmake -B build`
 
