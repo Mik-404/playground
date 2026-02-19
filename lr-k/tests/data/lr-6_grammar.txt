@@ -1,0 +1,6 @@
+S -> E c c c c c d
+S -> T c c c c c e
+E -> E + n
+T -> T * n
+E -> n
+T -> n
