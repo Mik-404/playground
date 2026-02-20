@@ -28,12 +28,21 @@ class GrammarAnalysis {
         lookahead_list result;
         result.reserve(lhs.size() * rhs.size());
         for (auto i : lhs) {
+            if (i.len == Lookahead) {
+                result.push_back(i);
+                continue;
+            }
             for (auto j : rhs) {
                 KString next_candidate = i + j;
                 if (result.empty() || next_candidate != result.back()) result.push_back(next_candidate);
             }
         }
-        result.shrink_to_fit();
+        
+        std::sort(result.begin(), result.end());
+    
+        auto last = std::unique(result.begin(), result.end());
+        result.erase(last, result.end());
+
         return result;
     }
 
