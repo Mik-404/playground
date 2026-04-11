@@ -1,0 +1,21 @@
+[
+  {
+    "Version": 1,
+    "Key": "623",
+    "Type": "City",
+    "Rank": 20,
+    "LocalizedName": "Paris",
+    "EnglishName": "Paris",
+    "PrimaryPostalCode": "",
+    "Region": {
+      "ID": "EUR",
+      "LocalizedName": "Europe",
+      "EnglishName": "Europe"
+    },
+    "Country": {
+      "ID": "FR",
+      "LocalizedName": "France",
+      "EnglishName": "France"
+    }
+  }
+]

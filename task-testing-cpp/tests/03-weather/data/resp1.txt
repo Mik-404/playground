@@ -1,0 +1,21 @@
+[
+  {
+    "Version": 1,
+    "Key": "328328",
+    "Type": "City",
+    "Rank": 10,
+    "LocalizedName": "London",
+    "EnglishName": "London",
+    "PrimaryPostalCode": "EC4A 2",
+    "Region": {
+      "ID": "EUR",
+      "LocalizedName": "Europe",
+      "EnglishName": "Europe"
+    },
+    "Country": {
+      "ID": "GB",
+      "LocalizedName": "United Kingdom",
+      "EnglishName": "United Kingdom"
+    }
+  }
+]

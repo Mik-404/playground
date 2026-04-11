@@ -1,0 +1,25 @@
+[
+  {
+    "LocalObservationDateTime": "2025-04-09T22:11:00+02:00",
+    "EpochTime": 1744229460,
+    "WeatherText": "Clear",
+    "WeatherIcon": 33,
+    "HasPrecipitation": false,
+    "PrecipitationType": null,
+    "IsDayTime": false,
+    "Temperature": {
+      "Metric": {
+        "Value": 14.8,
+        "Unit": "C",
+        "UnitType": 17
+      },
+      "Imperial": {
+        "Value": 59,
+        "Unit": "F",
+        "UnitType": 18
+      }
+    },
+    "MobileLink": "http://www.accuweather.com/en/fr/paris/623/current-weather/623?lang=en-us",
+    "Link": "http://www.accuweather.com/en/fr/paris/623/current-weather/623?lang=en-us"
+  }
+]

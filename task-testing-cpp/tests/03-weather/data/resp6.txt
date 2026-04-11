@@ -1,0 +1,66 @@
+{
+  "DailyForecasts": [
+    {
+      "Date": "2025-04-09T07:00:00+02:00",
+      "EpochDate": 1744174800,
+      "Temperature": {
+        "Minimum": {
+          "Value": 6.5,
+          "Unit": "C",
+          "UnitType": 17
+        },
+        "Maximum": {
+          "Value": 18.1,
+          "Unit": "C",
+          "UnitType": 17
+        }
+      },
+      "Day": {
+        "Icon": 2,
+        "IconPhrase": "Mostly sunny",
+        "HasPrecipitation": false
+      },
+      "Night": {
+        "Icon": 33,
+        "IconPhrase": "Clear",
+        "HasPrecipitation": false
+      },
+      "Sources": [
+        "AccuWeather"
+      ],
+      "MobileLink": "http://www.accuweather.com/en/fr/paris/623/daily-weather-forecast/623?day=1&unit=c&lang=en-us",
+      "Link": "http://www.accuweather.com/en/fr/paris/623/daily-weather-forecast/623?day=1&unit=c&lang=en-us"
+    },
+    {
+      "Date": "2025-04-10T07:00:00+02:00",
+      "EpochDate": 1744261200,
+      "Temperature": {
+        "Minimum": {
+          "Value": 6,
+          "Unit": "C",
+          "UnitType": 17
+        },
+        "Maximum": {
+          "Value": 17.9,
+          "Unit": "C",
+          "UnitType": 17
+        }
+      },
+      "Day": {
+        "Icon": 2,
+        "IconPhrase": "Mostly sunny",
+        "HasPrecipitation": false
+      },
+      "Night": {
+        "Icon": 33,
+        "IconPhrase": "Clear",
+        "HasPrecipitation": false
+      },
+      "Sources": [
+        "AccuWeather"
+      ],
+      "MobileLink": "http://www.accuweather.com/en/fr/paris/623/daily-weather-forecast/623?day=2&unit=c&lang=en-us",
+      "Link": "http://www.accuweather.com/en/fr/paris/623/daily-weather-forecast/623?day=2&unit=c&lang=en-us"
+    }
+  ]
+}
