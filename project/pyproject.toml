@@ -1,0 +1,46 @@
+[project]
+name = "ai-life-simulator"
+version = "0.1.0"
+description = "Simulation of the behavior of primitive agents on a discrete plane with some limitations"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [
+  { name="Mik_404", email="isaev.is@phystech.edu" },
+]
+
+dependencies = [
+  "numpy>=2.2.5",
+  "pygame>=2.6.1",
+  "torch==2.7.0+cu128",
+  "torchaudio==2.7.0+cu128",
+  "torchvision==0.22.0+cu128",
+]
+
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "pytest-cov",
+  "pytest-mock"
+]
+
+
+[build-system]
+requires = ["setuptools>=67.0"] # Требования для сборки
+build-backend = "setuptools.build_meta" # Backend для сборки
+
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*", "temp*", "saved_models*"]
+
+[tool.setuptools.package-data]
+ai_life_simulator = ["assets/*"]
+
+[project.scripts]
+sim_start = "ai_life_simulator._front.cli.main:main"
