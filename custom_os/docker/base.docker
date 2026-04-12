@@ -1,0 +1,91 @@
+FROM alpine:3.19 as builder
+
+RUN apk add --no-cache gpg dirmngr gpg-agent \
+    build-base bison flex gmp-dev mpc1-dev mpfr-dev texinfo isl-dev \
+    wget
+
+ENV PATH "/opt/os/cross/bin:$PATH"
+
+WORKDIR /build
+RUN wget -nv https://mirror.yandex.ru/mirrors/gnu/binutils/binutils-2.41.tar.xz
+RUN tar -xf binutils-2.41.tar.xz
+WORKDIR /build/binutils
+RUN ../binutils-2.41/configure \
+    --target=x86_64-none-elf \
+    --prefix=/opt/os/cross \
+    --with-sysroot \
+    --disable-nls \
+    --disable-werror
+RUN make -j$(nproc) && make install
+
+WORKDIR /build
+RUN wget -nv https://mirror.yandex.ru/mirrors/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.gz
+RUN tar -xf gcc-13.2.0.tar.gz
+WORKDIR /build/gcc
+RUN ../gcc-13.2.0/configure \
+    --target=x86_64-none-elf \
+    --prefix=/opt/os/cross \
+    --disable-nls \
+    --enable-languages=c,c++ \
+    --without-headers \
+    --disable-hosted-libstdcxx
+RUN make -j$(nproc) all-gcc && \
+    make -j$(nproc) all-target-libgcc && \
+    make -j$(nproc) all-target-libstdc++-v3 && \
+    make install-gcc && \
+    make install-target-libgcc && \
+    make install-target-libstdc++-v3
+
+WORKDIR /build
+RUN apk add expat-dev ncurses-dev zlib-dev python3-dev
+RUN wget -nv https://mirror.yandex.ru/mirrors/gnu/gdb/gdb-14.1.tar.xz
+RUN tar -xf gdb-14.1.tar.xz
+WORKDIR /build/gdb
+RUN ../gdb-14.1/configure \
+    --target=x86_64-none-elf \
+    --prefix=/opt/os/cross \
+    --disable-werror \
+    --with-expat \
+    --enable-tui \
+    --with-python=$(which python3)
+RUN make -j$(nproc) all-gdb && make install-gdb
+
+FROM alpine:3.19
+COPY --from=builder /opt/os /opt/os
+
+# Install libraries used during compilation and utilities to build kernel.
+RUN apk add --no-cache gmp-dev mpc1-dev mpfr-dev isl-dev \
+    expat ncurses zlib python3 \
+    wget make nano grub xorriso bash genext2fs e2tools \
+    py3-pip qemu qemu-system-x86_64 build-base linux-headers libcap-dev
+
+# Hack for installing grub-bios on arm64.
+RUN mkdir /build && \
+    wget -nv https://dl-cdn.alpinelinux.org/alpine/v3.19/main/x86/grub-bios-2.06-r17.apk && \
+    apk add --allow-untrusted --no-network --no-cache ./grub-bios-2.06-r17.apk && \
+    rm -rf /build
+
+RUN wget -nv https://gitlab.com/qemu-project/qemu/-/archive/v8.2.0/qemu-v8.2.0.tar.gz && \
+    tar -xf qemu-v8.2.0.tar.gz && \
+    cd qemu-v8.2.0/python && \
+    pip3 install --break-system-packages --no-cache-dir . && \
+    rm -rf /build
+
+RUN wget -nv https://github.com/google/minijail/archive/refs/tags/linux-v18.zip && \
+    unzip linux-v18.zip && \
+    cd minijail-linux-v18 && \
+    make -j$(nproc) LIBDIR=/usr/local/lib && \
+    cp -v minijail0 /usr/local/bin/ && \
+    cp -v libminijail.so libminijailpreload.so /usr/local/lib && \
+    rm -rf /build
+
+WORKDIR /usr/local/
+RUN wget -nv https://boostorg.jfrog.io/artifactory/main/release/1.84.0/source/boost_1_84_0.tar.gz && \
+    tar -xvf boost_1_84_0.tar.gz && \
+    rm boost_1_84_0.tar.gz
+
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --break-system-packages -r /tmp/requirements.txt
+
+ENV PATH "/opt/os/cross/bin:$PATH"
+WORKDIR /opt/os/work

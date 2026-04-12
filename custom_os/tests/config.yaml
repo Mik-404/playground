@@ -1,0 +1,44 @@
+TESTING_IN_QEMU:
+  type: bool
+  description: Compile special handling for testing inside QEMU
+  default: false
+
+TEST_MULTIBOOT:
+  type: bool
+  description: Compile multiboot test
+  default: false
+
+TEST_MULTIBOOT_FAKE_MAGIC:
+  type: bool
+  description: Pass fake magic on multiboot load
+  default: false
+
+TEST_LAPIC_TIMER:
+  type: bool
+  description: Compile LAPIC timer test
+  default: false
+
+TEST_PAGE_ALLOC_BASIC:
+  type: bool
+  description: Compile page allocator basic test
+  default: false
+
+TEST_PAGE_ALLOC_FRAGMENTATION:
+  type: bool
+  description: Compile page allocator fragmentation test
+  default: false
+
+TEST_PAGE_ALLOC_TRACE_PTRS:
+  type: bool
+  description: Print all allocated pointers in page alloc tests
+  default: false
+
+TEST_SLAB_ALLOC:
+  type: bool
+  description: Compile slab allocator test
+  default: false
+
+DUPLICATE_PRINTK_TO_COM2:
+  type: bool
+  description: Duplicate all output to COM2 port
+  default: false

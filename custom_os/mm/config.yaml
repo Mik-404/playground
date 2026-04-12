@@ -1,0 +1,4 @@
+TRACE_PAGE_FAULTS:
+  type: bool
+  description: Enable page fault tracing
+  default: false

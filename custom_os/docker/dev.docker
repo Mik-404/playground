@@ -1,0 +1,5 @@
+FROM docker.gitlab.carzil.ru/os-advanced/public-images/base-image:latest
+
+RUN apk add bear clang clang-dev
+RUN adduser dev -D && mkdir -p /opt/os/work
+WORKDIR /opt/os/work

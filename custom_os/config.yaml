@@ -1,0 +1,21 @@
+OPTIMIZE_LEVEL:
+  type: string
+  enum: [ "0", "1", "2", "3" ]
+  description: Compiler optimization level
+  default: "0"
+
+TARGET_ARCH:
+  type: string
+  enum: [ x86 ]
+  description: Target architecture to compile
+  required: true
+
+KASAN:
+  type: bool
+  description: Enable kernel address sanitizer
+  default: false
+
+COMPILE_STUBS:
+  type: bool
+  description: Compile stubs instead of original HellOS code.
+  default: false

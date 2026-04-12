@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export HELLOS_ROOT="$(realpath ${CURR_DIR}/..)"
+export CONT_ROOT="/opt/os/work"
+IMAGE="docker.gitlab.carzil.ru/os-advanced/public-images/dev"
+CONTAINER_NAME="caos-dev"
+
+function _ensure_container() {
+    if docker container inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
+        local state
+        state=$(docker inspect --format='{{.State.Running}}' "$CONTAINER_NAME")
+        if [ "$state" != "true" ]; then
+            docker start "$CONTAINER_NAME" > /dev/null
+        fi
+    else
+        mkdir -p "${HELLOS_ROOT}/.cache/clangd"
+        docker run -d \
+            --name "$CONTAINER_NAME" \
+            -v "${HELLOS_ROOT}:${CONT_ROOT}" \
+            -v "${HELLOS_ROOT}/.cache/clangd:/root/.cache/clangd" \
+            -w "${CONT_ROOT}" \
+            --add-host=host.docker.internal:host-gateway \
+            "$IMAGE" \
+            sleep infinity >/dev/null
+    fi
+}
+
+function _docker_exec() {
+    _ensure_container
+    docker exec \
+        -w "${CONT_ROOT}" \
+        "$CONTAINER_NAME" \
+        "$@"
+}
+
+function _docker_exec_it() {
+    _ensure_container
+    docker exec -it \
+        -e FORCE_COLOR=1 \
+        -w "${CONT_ROOT}" \
+        "$CONTAINER_NAME" \
+        "$@"
+}
+
+echo $(basename $0) >&2
+
+case $(basename $0) in
+    caos-make)
+        _docker_exec_it bear --append -- make $@
+        ;;
+    caos-gcc)
+        _docker_exec_it x86_64-none-elf-gcc $@
+        ;;
+    caos-gdb)
+        _docker_exec_it x86_64-none-elf-gdb \
+            -ex 'file kernel.elf' \
+            -ex 'symbol-file kernel.sym' \
+            -ex 'source debug/gdb_utils.py' \
+            -ex 'target remote host.docker.internal:1234'
+        ;;
+    caos-objdump)
+        _docker_exec x86_64-none-elf-objdump $@
+        ;;
+    caos-nm)
+        _docker_exec x86_64-none-elf-nm $@
+        ;;
+    caos-readelf)
+        _docker_exec x86_64-none-elf-readelf $@
+        ;;
+    caos-update)
+        docker pull ${IMAGE}
+        ;;
+    caos-run)
+        _docker_exec $@
+        ;;
+    caos-shell)
+        _docker_exec_it /bin/bash
+        ;;
+    caos-bear)
+        make clean
+        _docker_exec_it bear -- make all -j$(getconf _NPROCESSORS_ONLN)
+        ;;
+    caos-clangd)
+        _ensure_container
+        exec docker exec -i \
+            -w "${CONT_ROOT}" \
+            "$CONTAINER_NAME" \
+            clangd \
+                --path-mappings="${HELLOS_ROOT}=${CONT_ROOT}" \
+                --query-driver="/opt/os/cross/bin/*" \
+                --background-index \
+                --completion-style=detailed \
+                --clang-tidy \
+                "$@"
+        ;;
+    caos-stop)
+        docker rm -f "$CONTAINER_NAME" 2>/dev/null
+        echo "> Stopped and removed container $CONTAINER_NAME"
+        ;;
+    *)
+        ;;
+esac

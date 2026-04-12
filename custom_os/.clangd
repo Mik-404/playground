@@ -1,0 +1,16 @@
+CompileFlags:
+  Add:
+    - "-D__cpp_concepts=202002L"
+  Remove:
+    - "-maddress-mode=*"
+    - "-fsanitize=*"
+    - "-Wno-changes-meaning"
+    - "-Wno-dangling-pointer"
+Diagnostics:
+  UnusedIncludes: None
+---
+If:
+  PathMatch: .*\.h
+CompileFlags:
+  Add:
+    - "-xc++"

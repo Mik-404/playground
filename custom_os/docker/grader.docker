@@ -1,0 +1,15 @@
+FROM docker.gitlab.carzil.ru/os-advanced/public-images/base-image:latest
+
+RUN apk add docker ccache strace
+
+WORKDIR /opt/os-grader
+RUN mkdir /.ccache && chown nobody:nobody /.ccache && chmod 777 /.ccache
+
+COPY requirements.txt .
+
+RUN pip3 install --break-system-packages -r requirements.txt
+
+COPY . /opt/os-grader
+
+# Grader script run as nobody:nobody, so protect private directory
+RUN chmod -R 750 /opt/os-grader

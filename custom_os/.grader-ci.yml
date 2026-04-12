@@ -1,0 +1,23 @@
+variables:
+  GIT_DEPTH: 10
+  GIT_STRATEGY: clone
+  DOCKER_TLS_CERTDIR: "/certs"
+  TERM: xterm
+  FORCE_COLOR: "1"
+  GRADER_IMAGE: docker.gitlab.carzil.ru/os-advanced/private/grader
+  MANYTASK_URL: https://manytask.carzil.ru
+  SANDBOX: minijail
+  COURSE_NAME: mipt-os-advanced-2026
+  PUSH_RESULTS: "1"
+
+grade:
+  image: $GRADER_IMAGE:latest
+  rules:
+    - if: $CI_PROJECT_NAME =~ /^hellos/
+      when: never
+    - when: on_success
+  script:
+    - cd /opt/os-grader
+    - mkdir /builds/grader-tmp
+    - TMPDIR=/builds/grader-tmp python3 -u grade.py
+  timeout: 10 minutes
