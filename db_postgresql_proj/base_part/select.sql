@@ -31,14 +31,16 @@ WITH DevStats AS (
     JOIN cicd.Developer d ON p.trigger_dev_id = d.developer_id
     GROUP BY r.name, d.nickname
 )
-SELECT d1.repo, d1.nickname, d1.run_count
-FROM DevStats d1
-JOIN (
-    SELECT repo, MAX(run_count) as max_runs
+SELECT repo, nickname, run_count
+FROM (
+    SELECT repo, 
+           nickname, 
+           run_count,
+           RANK() OVER (PARTITION BY repo ORDER BY run_count DESC) as rnk
     FROM DevStats
-    GROUP BY repo
-) d2 ON d1.repo = d2.repo AND d1.run_count = d2.max_runs
-ORDER BY d1.run_count DESC;
+) ranked_stats
+WHERE rnk = 1
+ORDER BY repo ASC, run_count DESC;
 
 -- Среднее время работы Pipeline в ветке в секундах, только для успешных
 SELECT b.branch_name, 
