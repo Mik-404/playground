@@ -7,6 +7,9 @@
 #include "lib/stack_unwind.h"
 #include "linker.h"
 #include "mm/vmem.h"
+#include "per_cpu.h"
+#include "x86.h"
+#include <cstddef>
 
 extern "C" {
 
@@ -163,8 +166,16 @@ void NmHandler(arch::Registers* regs) {
         ReportBadException(regs, "NM");
     }
 
+    uint64_t cr0 = x86::ReadCr0();
 
-   kern::SignalSend(sched::Current(), kern::Signal::SIGILL);
+    cr0 &= ~x86::CR0_TS;
+    x86::WriteCr0(cr0);
+    
+    x86::Fninit();
+
+    sched::Current()->arch_thread.SetFPUInitialization();
+
+    // kern::SignalSend(sched::Current(), kern::Signal::SIGILL);
     kern::IrqEnable();
     kern::SignalDeliver();
 }

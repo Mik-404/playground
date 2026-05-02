@@ -1,8 +1,10 @@
 #pragma once
 
+#include <cstdint>
 #include <stdint.h>
 
 #include "arch/x86/arch/regs.h"
+#include "arch/x86/x86.h"
 #include "kernel/error.h"
 
 namespace arch {
@@ -16,7 +18,11 @@ private:
 
     // For kernel context switching.
     uint64_t saved_kernel_rsp_ = 0;
+    
+    bool per_cpu_used = false;
 
+    // Area to store SSE/x87 context
+    alignas(x86::FXSAVE_AREA_ALIGNMENT) uint8_t fpu_context[x86::FXSAVE_AREA_SIZE_BYTES];
 
 public:
     static kern::Errno AllocateKstack(Thread& th) noexcept;
@@ -36,6 +42,9 @@ public:
         return *(const Registers*)((uintptr_t)kstack_top_ - sizeof(Registers));
     }
 
+    void* GetFPUArea () noexcept;
+
+    void SetFPUInitialization () noexcept;
 
     uint64_t SavedKernelRsp() const noexcept {
         return saved_kernel_rsp_;

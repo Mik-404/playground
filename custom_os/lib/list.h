@@ -9,14 +9,14 @@ struct ListNode {
     ListNode* next = nullptr;
     ListNode* prev = nullptr;
 
-    void Insert(ListNode* p, ListNode* n) {
+    void Insert(ListNode* p, ListNode* n) noexcept {
         p->next = this;
         prev = p;
         next = n;
         n->prev = this;
     }
 
-    void Remove() {
+    void Remove() noexcept {
         prev->next = next;
         next->prev = prev;
     }

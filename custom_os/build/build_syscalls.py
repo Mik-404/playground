@@ -4,6 +4,9 @@ from elftools.elf.elffile import ELFFile
 
 SYS_max = 21
 
+# в дальнейшем мы предполагаем, что у нас 2 аргумента
+assert (len(sys.argv) == 2)
+
 for fname in sys.argv[1:]:
     with open(fname, "rb") as f:
         elf = ELFFile(f)

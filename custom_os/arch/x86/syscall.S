@@ -81,3 +81,13 @@ FUNC(ReturnFromExecve):
     POP_REGS
     iretq
 FUNC_END(ReturnFromExecve)
+
+
+FUNC(GoToSignalHandler):
+    mov rsp, rdi
+    POP_REGS
+
+    swapgs
+
+    iretq
+FUNC_END(GoToSignalHandler)

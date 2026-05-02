@@ -10,6 +10,8 @@ namespace x86 {
 constexpr uint64_t RFLAGS_IF = 1 << 9;
 constexpr uint64_t RFLAGS_SAFE_MASK = 0b1000000111111010111;
 constexpr uint64_t RFLAGS_RESERVED_BITS = 0b10;
+constexpr uint64_t RFLAGS_ALLOWED_MASK = 0xCD5; 
+constexpr uint64_t RFLAGS_FORCED_MASK = 0x202; 
 
 constexpr uint64_t CR0_MP = 1 << 1;
 constexpr uint64_t CR0_EM = 1 << 2;
@@ -20,7 +22,8 @@ constexpr uint64_t CR4_OSFXSR = 1 << 9;
 constexpr uint64_t CR4_OSXMMEXCPT = 1 << 10;
 constexpr uint64_t CR4_OSXSAVE = 1 << 18;
 
-constexpr size_t FXSAVE_STATE_SIZE = 512;
+constexpr size_t FXSAVE_AREA_SIZE_BYTES = 512;
+constexpr size_t FXSAVE_AREA_ALIGNMENT = 16;
 
 inline uint64_t ReadCr0() noexcept {
     uint64_t ret;
@@ -201,6 +204,10 @@ inline void Fxsave(void* state) noexcept {
 
 inline void Fxrstor(void* state) noexcept {
     __asm__ volatile ("fxrstor (%0)" : : "r"(state) );
+}
+
+inline void Fninit() noexcept {
+    __asm__ volatile ("fninit");
 }
 
 inline void Invlpg(uint64_t addr) noexcept {

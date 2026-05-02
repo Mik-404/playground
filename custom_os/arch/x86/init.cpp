@@ -172,7 +172,15 @@ void InitCpuCommon() noexcept {
 
     // Enable write-protection to prevent supervisor from writing to read-only pages.
     cr0 |= x86::CR0_WP;
+    cr0 |= x86::CR0_MP;
+    cr0 &= ~x86::CR0_EM;
     x86::WriteCr0(cr0);
+
+    uint64_t cr4 = x86::ReadCr4();
+
+    cr4 |= x86::CR4_OSFXSR;
+    cr4 |= x86::CR4_OSXMMEXCPT;
+    x86::WriteCr4(cr4);
 
 
     // Enable NX bit.

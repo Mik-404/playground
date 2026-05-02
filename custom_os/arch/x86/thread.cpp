@@ -14,6 +14,7 @@
 #include "lib/common.h"
 #include "mm/page_alloc.h"
 #include "mm/paging.h"
+#include "per_cpu.h"
 
 PER_CPU_DECLARE(x86::Tss, cpu_tss);
 
@@ -33,6 +34,14 @@ namespace arch {
 
 Thread::~Thread() {
     mm::FreePageSimple((void*)(kstack_top_ - KERNEL_STACK_SIZE));
+}
+
+void* Thread::GetFPUArea () noexcept {
+    return fpu_context;
+}
+
+void Thread::SetFPUInitialization () noexcept {
+    per_cpu_used = true;
 }
 
 kern::Errno Thread::AllocateKstack(Thread& th) noexcept {
@@ -55,7 +64,7 @@ kern::Errno Thread::CloneCurrent(Thread* dst, int flags, void* ip, void* sp) noe
 
     Registers* regs = (Registers*)kstack_top;
     memset(regs, '\0', sizeof(Registers));
-
+    
     kstack_top -= sizeof(OnStackContext);
     OnStackContext* onstack_ctx = (OnStackContext*)kstack_top;
     memset(onstack_ctx, '\0', sizeof(OnStackContext));
@@ -70,6 +79,11 @@ kern::Errno Thread::CloneCurrent(Thread* dst, int flags, void* ip, void* sp) noe
     }
 
     Thread& curr = sched::Current()->arch_thread;
+    if (curr.per_cpu_used) {
+        x86::Fxsave(curr.GetFPUArea());
+    }
+    memcpy(dst->GetFPUArea(), curr.GetFPUArea(), x86::FXSAVE_AREA_SIZE_BYTES);
+    dst->per_cpu_used = curr.per_cpu_used;
     // Clone registers.
     *regs = curr.Regs();
     onstack_ctx->ret_addr = (uint64_t)InitUserThread;
@@ -90,7 +104,20 @@ uint64_t Thread::DoSwitchTo(Thread& next, uint64_t arg) noexcept {
 
     saved_user_rsp_ = PER_CPU_GET(saved_user_rsp);
     PER_CPU_SET(saved_user_rsp, next.saved_user_rsp_);
+    
+    if (this->per_cpu_used) {
+        x86::Fxsave(this->fpu_context);
+    }
 
+    uint64_t cr0 = x86::ReadCr0();
+    if (next.per_cpu_used) {
+        cr0 &= ~x86::CR0_TS;
+        x86::WriteCr0(cr0);
+        x86::Fxrstor(next.fpu_context);
+    } else {
+        cr0 |= x86::CR0_TS;
+        x86::WriteCr0(cr0);
+    }
     return ContextSwitch(&saved_kernel_rsp_, &next.saved_kernel_rsp_, arg);
 }
 

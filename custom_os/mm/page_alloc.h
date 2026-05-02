@@ -60,8 +60,11 @@ public:
         void* oa_owner;
         size_t pc_index;
     };
-
-    ListNode pc_dirty_list;
+    
+    union {
+        size_t oa_used_blocks;
+        ListNode pc_dirty_list;
+    };
     RefCounted ref_count;
 
 public:

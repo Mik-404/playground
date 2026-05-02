@@ -15,6 +15,7 @@
 #include "mm/page_alloc.h"
 #include "mm/paging.h"
 #include "lib/locking.h"
+#include "per_cpu.h"
 #include "uapi/resource.h"
 
 namespace arch {
@@ -295,9 +296,9 @@ static void ReparentChildren(Task& task) {
     }
 }
 
+
 [[noreturn]] void TaskExit(uint32_t status) {
     Task* curr = sched::Current();
-
     if (curr->pid == 1) {
         if (status & TASK_EXIT_KILLED) {
             panic("PID 1 was killed by signal %d", status & TASK_EXIT_CODE_MASK);
